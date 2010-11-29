@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    love (0.0.3)
+    love (0.0.4)
       activesupport
       yajl-ruby
 
