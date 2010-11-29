@@ -1,7 +1,7 @@
 = Love
 
-This library accesses the Tender REST API. It is my ode and thanks to the many
-improvements Aaron Patterson did on ActiveRecord.
+This library accesses the Tender REST API. It is my ode to and thanks for the tender 
+lovemaking Aaron Patterson is doing on ActiveRecord.
 
 It is currently read-only, and made especially for scripts that import data from 
 Tender to use in your own application. Feel free to fork and add missing API calls.
