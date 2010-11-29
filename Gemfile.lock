@@ -2,11 +2,13 @@ PATH
   remote: .
   specs:
     love (0.0.1)
+      activesupport
       yajl-ruby
 
 GEM
   remote: http://rubygems.org/
   specs:
+    activesupport (3.0.3)
     rake (0.8.7)
     yajl-ruby (0.7.8)
 
@@ -14,6 +16,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
   love!
   rake
   yajl-ruby

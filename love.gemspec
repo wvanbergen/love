@@ -17,8 +17,9 @@ Gem::Specification.new do |s|
   s.email    = ['willem@railsdoctors.com']
   s.homepage = 'http://github.com/wvanbergen/love'
 
-
+  s.add_runtime_dependency('activesupport')
   s.add_runtime_dependency('yajl-ruby')
+
   s.add_development_dependency('rake')
   # s.add_development_dependency('rspec', '~> 2.1')
 
