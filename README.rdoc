@@ -1,0 +1,41 @@
+= Love
+
+This library accesses the Tender REST API. It is my ode and thanks to the many
+improvements Aaron Patterson did on ActiveRecord.
+
+It is currently read-only, and made especially for scripts that import data from 
+Tender to use in your own application. Feel free to fork and add missing API calls.
+
+== Why?
+
+I previously used HTTParty to connect to the Tender API, but I ran into two issues:
+
+* HTTParty's JSON decoding is really slow, and resulted in "stack level too deep" 
+  exceptions. Love uses yajl to decode JSON instead.
+* Because Tender does not check or convert the encoding of email messages that they 
+  receive, invalid UTF-8 characters can get into the system, which will break Ruby
+  1.9. Love handles character encoding manually, and will replace all the invalid 
+  UTF-8 characters by the UTF "unknown character" character.
+* I still had to handle paging manually to get all data. Love will automatically
+  send multiple requests to get all the pages to iterate over all the available
+  objects.
+
+== Usage
+
+    require 'love'
+    tender = Love.connect('account', 'api_key')
+    
+    # Loop over all discussions:
+    tender.each_discussion do |discussion|
+      # your awesome stuff here
+    end
+    
+    # Also available:
+    tender.each_users { |c| ... }
+    tender.each_queue { |q| ... }
+    tender.each_category { |c| ... }
+    
+== About
+
+This library is Written by Willem van Bergen for Shopify, and is MIT licensed.
+
