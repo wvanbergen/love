@@ -1,8 +1,15 @@
 require 'uri'
 require 'net/https'
+require 'active_support'
 require 'yajl'
 
 class Love
+  
+  # Create a custom exception class.
+  class Exception < StandardError; end
+  
+  # Class for unauthorized exceptions
+  class Unauthorized < Love::Exception; end
   
   attr_accessor :logger
   
@@ -73,8 +80,15 @@ class Love
     })
 
     response = http.request(req)
-    converter = Encoding::Converter.new('binary', 'utf-8', :invalid => :replace, :undef => :replace)
-    Yajl::Parser.new.parse(converter.convert(response.body))
+    case response.code
+    when /2\d\d/
+      converter = Encoding::Converter.new('binary', 'utf-8', :invalid => :replace, :undef => :replace)
+      Yajl::Parser.new.parse(converter.convert(response.body))
+    when '401'
+      raise Love::Unauthorized, "Invalid credentials used!"
+    else
+      raise Love::Exception, "#{response.cody}: #{response.body}"
+    end
   end
   
   def buffered_each(path, list_key, options = {}, &block)
