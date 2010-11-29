@@ -35,7 +35,7 @@ Run <tt>gem install love</tt> or add <tt>gem 'love'</tt> to your Gemfile.
     end
     
     # Also available:
-    tender.each_users { |c| ... }
+    tender.each_user { |c| ... }
     tender.each_queue { |q| ... }
     tender.each_category { |c| ... }
     
