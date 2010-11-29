@@ -28,6 +28,6 @@ Gem::Specification.new do |s|
 
   # Do not change the files and test_files fields by hand. This will be done
   # automatically by the gem release script.
-  s.files      = %w()
+  s.files      = %w(.gitignore Gemfile Gemfile.lock LICENSE README.rdoc Rakefile lib/love.rb love.gemspec tasks/github-gem.rb)
   s.test_files = %w()
 end
