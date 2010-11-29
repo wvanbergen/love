@@ -5,6 +5,8 @@ require 'yajl'
 
 module Love
 
+  VERSION = "0.0.3"
+
   # Create a custom exception class.
   class Exception < StandardError; end
   
@@ -38,6 +40,14 @@ module Love
         ::URI.parse(input.to_s)
       else
         raise Love::Exception, "This does not appear to be a Tender #{kind} URI or ID!"
+      end
+    end
+    
+    def request_uri(base_uri, added_params = {})
+      base_params = base_uri.query ? CGI.parse(base_uri.query) : {}
+      get_params = base_params.merge(added_params || {})
+      base_uri.dup.tap do |uri|
+        uri.query = get_params.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
       end
     end
   end
@@ -119,24 +129,33 @@ module Love
     end
   
     def buffered_each(uri, list_key, options = {}, &block)
-      query_options = {}
-      query_options[:since] = options[:since].to_date.to_s(:db) if options[:since]
+      query_params = {}
+      query_params[:since] = options[:since].to_date.to_s(:db) if options[:since]
+      query_params[:page]  = [options[:start_page].to_i, 1].max rescue 1
       
-      uri.query = query_options.map { |k, v| "#{k}=#{v}" }.join('&')
-      initial_result = get(uri)
-      start_page = [options[:start_page].to_i, 1].max rescue 1
+      initial_result = get(request_uri(uri, query_params))
+      
+      # Determine the amount of pages that is going to be requested.
       max_page   = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
       end_page   = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
       # Print out some initial debugging information
-      Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{start_page} upto #{end_page}." if Love.logger
+      Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{query_params[:page]} upto #{end_page}." if Love.logger
     
-      start_page.upto(end_page) do |page|
-        query_options[:page] = page
-        uri.query = query_options.map { |k, v| "#{k}=#{v}" }.join('&')
-        result = get(uri)
-        result[list_key].each { |record| yield(record) }
+      # Handle first page of results
+      if initial_result[list_key].kind_of?(Array)
+        initial_result[list_key].each { |record| yield(record) }
         sleep(sleep_between_requests) if sleep_between_requests
+      end
+    
+      start_page = query_params[:page].to_i + 1
+      start_page.upto(end_page) do |page|
+        query_params[:page] = page
+        result = get(request_uri(uri, query_params))
+        if result[list_key].kind_of?(Array)
+          result[list_key].each { |record| yield(record) }
+          sleep(sleep_between_requests) if sleep_between_requests
+        end
       end
     end
   end
