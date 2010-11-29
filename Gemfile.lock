@@ -9,7 +9,16 @@ GEM
   remote: http://rubygems.org/
   specs:
     activesupport (3.0.3)
+    diff-lcs (1.1.2)
     rake (0.8.7)
+    rspec (2.2.0)
+      rspec-core (~> 2.2)
+      rspec-expectations (~> 2.2)
+      rspec-mocks (~> 2.2)
+    rspec-core (2.2.1)
+    rspec-expectations (2.2.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.2.0)
     yajl-ruby (0.7.8)
 
 PLATFORMS
@@ -19,4 +28,5 @@ DEPENDENCIES
   activesupport
   love!
   rake
+  rspec (~> 2)
   yajl-ruby
