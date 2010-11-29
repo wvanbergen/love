@@ -16,9 +16,13 @@ I previously used HTTParty to connect to the Tender API, but I ran into two issu
   receive, invalid UTF-8 characters can get into the system, which will break Ruby
   1.9. Love handles character encoding manually, and will replace all the invalid 
   UTF-8 characters by the UTF "unknown character" character.
-* I still had to handle paging manually to get all data. Love will automatically
+* I had to handle paging manually to get all data. Love will automatically
   send multiple requests to get all the pages to iterate over all the available
   objects.
+
+== Installation
+
+Run <tt>gem install love</tt> or add <tt>gem 'love'</tt> to your Gemfile.
 
 == Usage
 
