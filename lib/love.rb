@@ -61,7 +61,7 @@ class Love
   
   def each_discussion(options = {}, &block)
     buffered_each('discussions', 'discussions', options, &block)
-  end  
+  end
   
   protected
   
@@ -81,13 +81,13 @@ class Love
 
     response = http.request(req)
     case response.code
-    when /2\d\d/
+    when /^2\d\d/
       converter = Encoding::Converter.new('binary', 'utf-8', :invalid => :replace, :undef => :replace)
       Yajl::Parser.new.parse(converter.convert(response.body))
     when '401'
       raise Love::Unauthorized, "Invalid credentials used!"
     else
-      raise Love::Exception, "#{response.cody}: #{response.body}"
+      raise Love::Exception, "#{response.code}: #{response.body}"
     end
   end
   
@@ -101,7 +101,6 @@ class Love
     end_page   = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
     # Print out some initial debugging information
-    
     logger.debug "Paged requests to #{path}: #{max_page} total pages, importing #{start_page} upto #{end_page}." if logger
     
     start_page.upto(end_page) do |page|
