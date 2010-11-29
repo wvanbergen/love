@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
 
   # Do not change the version and date fields by hand. This will be done
   # automatically by the gem release script.
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.date    = "2010-11-29"
 
   s.summary     = "Ruby library to access the Tender REST API."
@@ -28,6 +28,6 @@ Gem::Specification.new do |s|
 
   # Do not change the files and test_files fields by hand. This will be done
   # automatically by the gem release script.
-  s.files      = %w(.gitignore Gemfile Gemfile.lock LICENSE README.rdoc Rakefile lib/love.rb love.gemspec tasks/github-gem.rb)
-  s.test_files = %w()
+  s.files      = %w(.gitignore Gemfile Gemfile.lock LICENSE README.rdoc Rakefile lib/love.rb love.gemspec spec/love_spec.rb spec/spec_helper.rb tasks/github-gem.rb)
+  s.test_files = %w(spec/love_spec.rb)
 end
