@@ -93,7 +93,7 @@ module Love
     protected
   
     def get(uri)
-      Love.logger.debug "GET #{url}" if Love.logger
+      Love.logger.debug "GET #{uri}" if Love.logger
 
       http = Net::HTTP.new(uri.host, uri.port)
       if uri.scheme = 'https'
@@ -121,16 +121,18 @@ module Love
     def buffered_each(uri, list_key, options = {}, &block)
       query_options = {}
       query_options[:since] = options[:since].to_date.to_s(:db) if options[:since]
-
-      initial_result = get(path, :query => query_options)
+      
+      uri.query = query_options.map { |k, v| "#{k}=#{v}" }.join('&')
+      initial_result = get(uri)
       start_page = [options[:start_page].to_i, 1].max rescue 1
       max_page   = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
       end_page   = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
       # Print out some initial debugging information
-      Love.logger.debug "Paged requests to #{path}: #{max_page} total pages, importing #{start_page} upto #{end_page}." if Love.logger
+      Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{start_page} upto #{end_page}." if Love.logger
     
       start_page.upto(end_page) do |page|
+        query_options[:page] = page
         uri.query = query_options.map { |k, v| "#{k}=#{v}" }.join('&')
         result = get(uri)
         result[list_key].each { |record| yield(record) }
