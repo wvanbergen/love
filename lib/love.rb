@@ -230,7 +230,7 @@ module Love
     def connection
       @connection ||= Net::HTTP.new(TENDER_API_HOST, Net::HTTP.https_default_port).tap do |http|
         http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        # http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         http.start
       end
     end
