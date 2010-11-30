@@ -1,4 +1,5 @@
 require 'uri'
+require 'cgi'
 require 'net/https'
 require 'active_support/core_ext/module/attribute_accessors.rb'
 require 'yajl'
@@ -43,11 +44,11 @@ module Love
       end
     end
     
-    def request_uri(base_uri, added_params = {})
+    def append_query(base_uri, added_params = {})
       base_params = base_uri.query ? CGI.parse(base_uri.query) : {}
       get_params = base_params.merge(added_params || {})
       base_uri.dup.tap do |uri|
-        uri.query = get_params.map { |k, v| "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"}.join('&')
+        uri.query = get_params.map { |k, v| "#{::CGI.escape(k.to_s)}=#{::CGI.escape(v.to_s)}"}.join('&')
       end
     end
   end
@@ -111,7 +112,7 @@ module Love
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
       
-      req = Net::HTTP::Get.new(uri.request_uri, {
+      req = Net::HTTP::Get.new(uri.append_query, {
         "Accept"        => "application/vnd.tender-v1+json",
         "X-Tender-Auth" => api_key
       })
@@ -133,7 +134,7 @@ module Love
       query_params[:since] = options[:since].to_date.to_s(:db) if options[:since]
       query_params[:page]  = [options[:start_page].to_i, 1].max rescue 1
       
-      initial_result = get(request_uri(uri, query_params))
+      initial_result = get(append_query(uri, query_params))
       
       # Determine the amount of pages that is going to be requested.
       max_page   = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
@@ -151,7 +152,7 @@ module Love
       start_page = query_params[:page].to_i + 1
       start_page.upto(end_page) do |page|
         query_params[:page] = page
-        result = get(request_uri(uri, query_params))
+        result = get(append_query(uri, query_params))
         if result[list_key].kind_of?(Array)
           result[list_key].each { |record| yield(record) }
           sleep(sleep_between_requests) if sleep_between_requests
