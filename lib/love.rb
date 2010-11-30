@@ -275,6 +275,12 @@ module Love
       close_connection unless persistent?
     end
   
+    # Converts a binary, (alomst) UTF-8 string into an actual UTF-8 string.
+    # It will replace any unknown characters or unvalid byte sequences into a UTF-8
+    # "unknown character" question mark.
+    #
+    # @param [String] binary_string The input string, should have binary encoding
+    # @return [String] The string using UTF-8 encoding.
     def safely_convert_to_utf8(binary_string)
       if binary_string.respond_to?(:force_encoding)
         # Ruby 1.9
@@ -289,6 +295,7 @@ module Love
     # Iterates over a collection, issuing multiple requests to get all the paged results.
     #
     # @option options [Date] :since Only include records updated since the provided date.
+    #   Caution: not supported by all resources.
     # @option options [Integer] :start_page The initial page number to request.
     # @option options [Integer] :end_page The final page number to request.
     def paged_each(uri, list_key, options = {}, &block)
@@ -299,8 +306,8 @@ module Love
       initial_result = get(append_query(uri, query_params))
       
       # Determine the amount of pages that is going to be requested.
-      max_page   = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
-      end_page   = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
+      max_page = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
+      end_page = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
       # Print out some initial debugging information
       Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{query_params[:page]} upto #{end_page}." if Love.logger
