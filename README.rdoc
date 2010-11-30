@@ -27,7 +27,7 @@ Run <tt>gem install love</tt> or add <tt>gem "love"</tt> to your Gemfile.
 == Usage
 
     require 'love'
-    tender = Love.connect('account', 'api_key')
+    tender = Love.connect('site', 'api_key')
     
     # Loop over all discussions:
     tender.each_discussion do |discussion|
@@ -41,7 +41,7 @@ Run <tt>gem install love</tt> or add <tt>gem "love"</tt> to your Gemfile.
     
     # Or get a single record, using an ID or HREF:
     d = tender.get_discussion('12345')
-    u = tender.get_user('https://api.tenderapp.com/account/users/12345')
+    u = tender.get_user('https://api.tenderapp.com/site/users/12345')
 
 == About
 

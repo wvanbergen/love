@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Love::ResourceURI do
   
   include Love::ResourceURI
-  def account; "mysupport"; end
+  def site; "mysupport"; end
   
   describe '#collection_uri' do
 
@@ -23,7 +23,7 @@ describe Love::ResourceURI do
       collection_uri(uri).should == uri
     end
     
-    it "should not accept a URI for another account" do
+    it "should not accept a URI for another site" do
       lambda { collection_uri('https://api.tenderapp.com/other/bars') }.should raise_error(Love::Exception)
     end
 
@@ -54,7 +54,7 @@ describe Love::ResourceURI do
       singleton_uri(uri, 'bars').should == uri
     end
     
-    it "should not accept a URI for another account" do
+    it "should not accept a URI for another site" do
       lambda { singleton_uri('https://api.tenderapp.com/other/bars/123', 'bars') }.should raise_error(Love::Exception)
     end
 
