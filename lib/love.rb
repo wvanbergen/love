@@ -15,7 +15,7 @@ module Love
 
   # The current gem version. Will be updated automatically by the gem
   # release script.
-  VERSION = "0.0.4"
+  VERSION = "0.0.5"
 
   # Exception class a custom exception class.
   class Exception < StandardError; end

@@ -3,8 +3,8 @@ Gem::Specification.new do |s|
 
   # Do not change the version and date fields by hand. This will be done
   # automatically by the gem release script.
-  s.version = "0.0.4"
-  s.date    = "2010-11-29"
+  s.version = "0.0.5"
+  s.date    = "2010-11-30"
 
   s.summary     = "Ruby library to access the Tender REST API."
   s.description = <<-EOT
