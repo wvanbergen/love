@@ -22,7 +22,7 @@ I previously used HTTParty to connect to the Tender API, but I ran into two issu
 
 == Installation
 
-Run <tt>gem install love</tt> or add <tt>gem 'love'</tt> to your Gemfile.
+Run <tt>gem install love</tt> or add <tt>gem "love"</tt> to your Gemfile.
 
 == Usage
 
@@ -35,11 +35,15 @@ Run <tt>gem install love</tt> or add <tt>gem 'love'</tt> to your Gemfile.
     end
     
     # Also available:
-    tender.each_user { |c| ... }
+    tender.each_user { |u| ... }
     tender.each_queue { |q| ... }
     tender.each_category { |c| ... }
     
+    # Or get a single record, using an ID or HREF:
+    d = tender.get_discussion('12345')
+    u = tender.get_user('https://api.tenderapp.com/account/users/12345')
+
 == About
 
-This library is Written by Willem van Bergen for Shopify, and is MIT licensed.
+This library is written by Willem van Bergen for Shopify, and is MIT licensed.
 
