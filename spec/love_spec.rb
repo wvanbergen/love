@@ -52,7 +52,7 @@ describe Love::ResourceURI do
       uri = URI.parse('https://api.tenderapp.com/mysupport/bars/789')
       singleton_uri(uri, 'bars').should be_kind_of(::URI)
       singleton_uri(uri, 'bars').should == uri
-    end    
+    end
     
     it "should not accept a URI for another account" do
       lambda { singleton_uri('https://api.tenderapp.com/other/bars/123', 'bars') }.should raise_error(Love::Exception)
@@ -64,7 +64,32 @@ describe Love::ResourceURI do
 
     it "should not weird resource IDs" do
       lambda { singleton_uri('%!&', 'bars') }.should raise_error(Love::Exception)
-    end    
+    end
+  end
+  
+  describe '#append_query' do
+    before { @uri = URI.parse('https://api.tenderapp.com/') }
+    
+    it "should return a URI instance" do
+      append_query(@uri, :a => 'b').should be_kind_of(URI)
+    end
+    
+    it "should add a correctly quoted query string" do
+      adjusted = append_query(@uri, :a => 'some data')
+      adjusted.to_s.should == 'https://api.tenderapp.com/?a=some+data'
+    end
+    
+    it "should keep existing query parameters intact" do
+      @uri.query = 'foo=bar'
+      adjusted = append_query(@uri, :a => 'some data')
+      adjusted.to_s.should == 'https://api.tenderapp.com/?foo=bar&a=some+data'
+    end
+    
+    it "should overwrite existing parameters" do
+      @uri.query = 'foo=bar'
+      adjusted = append_query(@uri, :foo => 'baz')
+      adjusted.to_s.should == 'https://api.tenderapp.com/?foo=baz'
+    end
   end
 end
 

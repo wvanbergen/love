@@ -1,7 +1,8 @@
 require 'uri'
 require 'cgi'
 require 'net/https'
-require 'active_support/core_ext/module/attribute_accessors.rb'
+require 'active_support/core_ext/module/attribute_accessors'
+require 'active_support/core_ext/hash/keys'
 require 'yajl'
 
 module Love
@@ -46,9 +47,15 @@ module Love
     
     def append_query(base_uri, added_params = {})
       base_params = base_uri.query ? CGI.parse(base_uri.query) : {}
-      get_params = base_params.merge(added_params || {})
+      get_params = base_params.merge(added_params.stringify_keys)
       base_uri.dup.tap do |uri|
-        uri.query = get_params.map { |k, v| "#{::CGI.escape(k.to_s)}=#{::CGI.escape(v.to_s)}"}.join('&')
+        assignments = get_params.map do |k, v|
+          case v
+            when Array; v.map { |val| "#{::CGI.escape(k.to_s)}=#{::CGI.escape(val.to_s)}" }.join('&')
+            else "#{::CGI.escape(k.to_s)}=#{::CGI.escape(v.to_s)}"
+          end
+        end
+        uri.query = assignments.join('&')
       end
     end
   end
