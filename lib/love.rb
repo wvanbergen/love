@@ -187,6 +187,14 @@ module Love
     def get_queue(id_or_href)
       get(singleton_uri(id_or_href, 'queues'), options)
     end
+    
+    # Returns a single Tender FAQ.
+    # @param [URI, String, Integer] id_or_href The faq ID or HREF. Can be either a URI
+    #   instance, a string containing a URI, or a queue ID as a numeric string or integer.
+    # @return [Hash] The faq attributes in a Hash.
+    def get_faq(id_or_href)
+      get(singleton_uri(id_or_href, 'faqs'))
+    end
 
     # Iterates over all Tender categories.
     # @yield [Hash] The attributes of each category will be yielded as (nested) Hash.
@@ -268,7 +276,7 @@ module Love
         when Net::HTTPSuccess;      Yajl::Parser.new.parse(safely_convert_to_utf8(response.body))
         when Net::HTTPUnauthorized; raise Love::Unauthorized, "Invalid credentials used!"
         when Net::HTTPForbidden;    raise Love::Unauthorized, "You don't have permission to access this resource!"
-        when Net::NotFound;         raise Love::NotFound, "The resource #{uri} was not found!"
+        when Net::HTTPNotFound;     raise Love::NotFound, "The resource #{uri} was not found!"
         else raise Love::Exception, "#{response.code}: #{response.body}"
       end
     ensure 
