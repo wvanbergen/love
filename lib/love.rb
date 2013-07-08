@@ -72,10 +72,10 @@ module Love
     # Returns a collection URI, based on an URI instance, a complete URI string or just a resource name.
     # @return [URI] The URI on which the REST resource collection is accessible through the Tender REST API.
     # @raise [Love::Exception] If the input cannot be converted into a resource collection URI.
-    def collection_uri(input)
+    def collection_uri(input, options={})
       case input.to_s
       when /^[\w-]+$/
-        ::URI.parse("https://api.tenderapp.com/#{site}/#{input}")
+        options[:state] ? ::URI.parse("https://api.tenderapp.com/#{site}/#{input}/#{options[:state]}") : ::URI.parse("https://api.tenderapp.com/#{site}/#{input}")
       when %r[^https?://api\.tenderapp\.com/#{site}/[\w-]+]
         ::URI.parse(input.to_s)
       else
@@ -225,7 +225,7 @@ module Love
     # @option (see #paged_each)
     # @return [nil]
     def each_discussion(options = {}, &block)
-      paged_each(collection_uri('discussions'), 'discussions', options, &block)
+      paged_each(collection_uri('discussions', :state => options.delete(:state)), 'discussions', options, &block)
     end
     
     # Returns a persistent connection to the server, reusing a connection of it was
