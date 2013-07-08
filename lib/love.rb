@@ -310,31 +310,32 @@ module Love
       query_params = {}
       query_params[:since] = options[:since].to_date.to_s(:db) if options[:since]
       query_params[:page]  = [options[:start_page].to_i, 1].max rescue 1
-      
+      results = []
       initial_result = get(append_query(uri, query_params))
-      
+
       # Determine the amount of pages that is going to be requested.
       max_page = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
       end_page = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
       # Print out some initial debugging information
       Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{query_params[:page]} upto #{end_page}." if Love.logger
-    
+      
       # Handle first page of results
       if initial_result[list_key].kind_of?(Array)
-        initial_result[list_key].each { |record| yield(record) }
+        block_given? ? initial_result[list_key].each { |record| yield(record) } : results << initial_result[list_key]
         sleep(sleep_between_requests) if sleep_between_requests
       end
-    
+      
       start_page = query_params[:page].to_i + 1
       start_page.upto(end_page) do |page|
         query_params[:page] = page
         result = get(append_query(uri, query_params))
         if result[list_key].kind_of?(Array)
-          result[list_key].each { |record| yield(record) }
+          block_given? ? result[list_key].each { |record| yield(record) } : results << result[list_key]
           sleep(sleep_between_requests) if sleep_between_requests
         end
       end
+      results.flatten unless block_given?
     end
   end
 end
