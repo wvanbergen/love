@@ -4,6 +4,7 @@ require 'net/https'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/hash/keys'
 require 'yajl'
+require 'ostruct'
 
 # Love is a small Ruby library to interact with the Tender REST API.
 # The main object to work with is {Love::Client}, which is returned
@@ -335,7 +336,7 @@ module Love
           sleep(sleep_between_requests) if sleep_between_requests
         end
       end
-      results.flatten unless block_given?
+      results.flatten.map {|r| OpenStruct.new(r)} unless block_given?
     end
   end
 end
