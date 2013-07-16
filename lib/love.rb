@@ -4,6 +4,7 @@ require 'net/https'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/hash/keys'
 require 'yajl'
+require 'ostruct'
 
 # Love is a small Ruby library to interact with the Tender REST API.
 # The main object to work with is {Love::Client}, which is returned
@@ -72,10 +73,10 @@ module Love
     # Returns a collection URI, based on an URI instance, a complete URI string or just a resource name.
     # @return [URI] The URI on which the REST resource collection is accessible through the Tender REST API.
     # @raise [Love::Exception] If the input cannot be converted into a resource collection URI.
-    def collection_uri(input)
+    def collection_uri(input, options={})
       case input.to_s
       when /^[\w-]+$/
-        ::URI.parse("https://api.tenderapp.com/#{site}/#{input}")
+        options[:state] ? ::URI.parse("https://api.tenderapp.com/#{site}/#{input}/#{options[:state]}") : ::URI.parse("https://api.tenderapp.com/#{site}/#{input}")
       when %r[^https?://api\.tenderapp\.com/#{site}/[\w-]+]
         ::URI.parse(input.to_s)
       else
@@ -225,7 +226,7 @@ module Love
     # @option (see #paged_each)
     # @return [nil]
     def each_discussion(options = {}, &block)
-      paged_each(collection_uri('discussions'), 'discussions', options, &block)
+      paged_each(collection_uri('discussions', :state => options.delete(:state)), 'discussions', options, &block)
     end
     
     # Returns a persistent connection to the server, reusing a connection of it was
@@ -310,31 +311,32 @@ module Love
       query_params = {}
       query_params[:since] = options[:since].to_date.to_s(:db) if options[:since]
       query_params[:page]  = [options[:start_page].to_i, 1].max rescue 1
-      
+      results = []
       initial_result = get(append_query(uri, query_params))
-      
+
       # Determine the amount of pages that is going to be requested.
       max_page = (initial_result['total'].to_f / initial_result['per_page'].to_f).ceil
       end_page = options[:end_page].nil? ? max_page : [options[:end_page].to_i, max_page].min
     
       # Print out some initial debugging information
       Love.logger.debug "Paged requests to #{uri}: #{max_page} total pages, importing #{query_params[:page]} upto #{end_page}." if Love.logger
-    
+      
       # Handle first page of results
       if initial_result[list_key].kind_of?(Array)
-        initial_result[list_key].each { |record| yield(record) }
+        block_given? ? initial_result[list_key].each { |record| yield(record) } : results << initial_result[list_key]
         sleep(sleep_between_requests) if sleep_between_requests
       end
-    
+      
       start_page = query_params[:page].to_i + 1
       start_page.upto(end_page) do |page|
         query_params[:page] = page
         result = get(append_query(uri, query_params))
         if result[list_key].kind_of?(Array)
-          result[list_key].each { |record| yield(record) }
+          block_given? ? result[list_key].each { |record| yield(record) } : results << result[list_key]
           sleep(sleep_between_requests) if sleep_between_requests
         end
       end
+      results.flatten.map {|r| OpenStruct.new(r)} unless block_given?
     end
   end
 end
